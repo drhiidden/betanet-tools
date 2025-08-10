@@ -1,0 +1,15 @@
+[package]
+name = "htx-lab"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+bytes = "1.4"
+
+[dev-dependencies]
+# Use cargo-fuzz as an external tool; do not list as optional dev-dep here.
+
+[features]
+# Enable fuzzing targets when requested (run `cargo fuzz` externally)
+fuzz = []

@@ -3,6 +3,7 @@ members = [
   "crates/utls-template/hello-template",
   "crates/utls-template/hello-snapshot",
   "crates/utls-template/chrome-probe",
+  "crates/utls-template/cli",
   "crates/bn-lint",
   "crates/htx-lab",
   "crates/sbom",
