@@ -18,4 +18,4 @@ panic = "abort"       # menores binarios y rendimiento
 [workspace.package]
 # Metadata opcional del workspace (no publica crates automáticamente)
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/yourorg/betanet-tools"
+repository = "https://github.com/drhiidden/betanet-tools"

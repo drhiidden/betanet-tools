@@ -2,24 +2,32 @@
 
 Colección de utilidades y crates para el ecosistema Betanet.
 
-Estructura principal
+**Licencia**: core is dual-licensed `MIT OR Apache-2.0`. Consulte `LICENSE-MIT` y `LICENSE-APACHE`.
 
-- `crates/` — colección de crates Rust (ver `crates/README.md`).
+**Contribuciones**: antes de contribuir, lea `CONTRIBUTING.md` y `CODE_OF_CONDUCT.md`.
 
-Quick start
+## Documentación
+
+Toda la documentación está centralizada en `docs/`. Empezad por `docs/index.md` que contiene índice y enlaces a las áreas principales (management, communication, specs, utls-template, spec-linter).
+
+- Índice de docs: `docs/index.md`
+- Bounties y CLA: plantillas y guía en `docs/management/BOUNTY.md` y `docs/management/CLA.md`.
+  - Si queréis crear un bounty directamente en GitHub, usamos la plantilla de issue: `.github/ISSUE_TEMPLATE/bounty.md` (también disponible en `docs/management/ISSUE_TEMPLATE/bounty.md`).
+
+## Quick start
 
 - Compilar todo el workspace: `cargo build --release`
 - Compilar un crate: `cargo build -p <crate-name>`
-- Ejecutar tests: `cargo test`
+- Ejecutar el CLI uTLS: `cargo run -p utls-cli -- --help`
 
-Dónde empezar
+## Project layout
 
-- `crates/utls-template/` — generador uTLS y tooling asociado (principal punto de partida para las bounties).
+- `crates/utls-template/` — generador, snapshot, CLI.
+- `crates/bn-lint/` — spec linter (planificado).
 
-Más información
+## Security & Privacy
 
-- Detalles y convenciones: `crates/README.md`.
+- No publicar PCAPs con PII. Use fixtures sanitizados en `crates/utls-template/fixtures/`.
+- Para reportes de seguridad, vea `SECURITY.md`.
 
-Contribución
-
-- Sigue las convenciones de `crates/README.md`. Añade un `README.md` por cada nuevo crate y pruebas/goldens cuando sea necesario.
+Gracias por contribuir!
