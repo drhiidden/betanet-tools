@@ -13,33 +13,35 @@ pub enum CoreError {
 pub type Result<T> = std::result::Result<T, CoreError>;
 
 pub mod kdf {
+    use super::*;
     use hkdf::Hkdf;
     use sha2::Sha256;
 
-    /// Implementación de HKDF-Expand-Label (TLS1.3 style)
-    pub fn hkdf_expand_label(secret: &[u8], label: &str, context: &[u8], length: usize) -> Vec<u8> {
-        let full = format!("tls13 {}", label);
-        let mut info: Vec<u8> = Vec::new();
-        let l_be = (length as u16).to_be_bytes();
-        info.extend_from_slice(&l_be);
-        info.push(full.len() as u8);
-        info.extend_from_slice(full.as_bytes());
+    /// Implementa HKDF-Expand-Label con la construcción TLS1.3:
+    /// info = length(2) || label_len(1) || "tls13 " + label || context_len(1) || context
+    pub fn hkdf_expand_label(secret: &[u8], label: &str, context: &[u8], length: usize) -> Result<Vec<u8>> {
+        let full_label = format!("tls13 {}", label);
+        let mut info: Vec<u8> = Vec::with_capacity(2 + 1 + full_label.len() + 1 + context.len());
+        let l = (length as u16).to_be_bytes();
+        info.extend_from_slice(&l);
+        info.push(full_label.len() as u8);
+        info.extend_from_slice(full_label.as_bytes());
         info.push(context.len() as u8);
         info.extend_from_slice(context);
 
-        let hk = Hkdf::<Sha256>::from_prk(secret).expect("invalid prk");
+        let hk = Hkdf::<Sha256>::from_prk(secret).map_err(|e| CoreError::Io(format!("hkdf prk: {:?}", e)))?;
         let mut okm = vec![0u8; length];
-        hk.expand(&info, &mut okm).expect("hkdf expand failed");
-        okm
+        hk.expand(&info, &mut okm).map_err(|e| CoreError::Io(format!("hkdf expand: {:?}", e)))?;
+        Ok(okm)
     }
 
     /// Deriva k0 (64 bytes) y split usando la misma convención del C++
     pub fn derive_k0_and_split(tls_exporter_32: &[u8]) -> (Vec<u8>, Vec<u8>, Vec<u8>, Vec<u8>) {
-        let k0 = hkdf_expand_label(tls_exporter_32, "htx inner v1", &[], 64);
+        let k0 = hkdf_expand_label(tls_exporter_32, "htx inner v1", &[], 64).expect("derive k0 failed");
         let k0c = k0[0..32].to_vec();
         let k0s = k0[32..64].to_vec();
-        let nsc = hkdf_expand_label(&k0c, "ns", &[], 12);
-        let nss = hkdf_expand_label(&k0s, "ns", &[], 12);
+        let nsc = hkdf_expand_label(&k0c, "ns", &[], 12).expect("derive nsc failed");
+        let nss = hkdf_expand_label(&k0s, "ns", &[], 12).expect("derive nss failed");
         (k0c, k0s, nsc, nss)
     }
 }

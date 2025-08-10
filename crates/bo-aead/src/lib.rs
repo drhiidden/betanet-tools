@@ -1,5 +1,5 @@
 // bo-aead: wrappers mínimos para AEAD
-use bo_core::prelude::*;
+use bo_core::{Result, CoreError};
 use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce};
 use chacha20poly1305::aead::{Aead, KeyInit};
 
