@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-pcap = "0.10" # Versión a verificar, usar la más reciente compatible
 serde = { version = "1.0", features = ["derive"] }
-libc = "0.2"
+pcap-file = "1.1"
+pnet_packet = "0.34"
+
+# Dependencia para la captura de paquetes.
+# pcap = "0.10" # Deshabilitado temporalmente
+
+[build-dependencies]

@@ -111,7 +111,7 @@ pub fn ja3_from_raw(raw: &[u8]) -> Result<String, String> {
 
     // MD5
     let mut hasher = Md5::new();
-    hasher.update(s.as_bytes());
-    let res = hasher.finalize();
+    hasher.input(s.as_bytes());
+    let res = hasher.result();
     Ok(format!("{:x}", res))
 }

@@ -42,4 +42,13 @@ pub async fn export_keying_material_rustls(addr: &str, server_name: &str, label:
     }).await.map_err(|e| CoreError::Io(format!("task join error: {:?}", e)))?
 }
 
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert_eq!(result, 4);
+    }
+}
+
 

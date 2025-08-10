@@ -1,9 +1,10 @@
 pub mod export_utls;
+pub mod tls_record;
 
 use serde::{Serialize, Deserialize};
 use std::time::SystemTime;
 
-mod grease;
+pub mod grease;
 use grease::GreaseMode;
 
 #[derive(Serialize, Deserialize)]
@@ -254,5 +255,29 @@ impl Encoder {
         }
 
         Ok(EncodedClientHello { raw_bytes: encoded_bytes, pcap_bytes })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_encode_minimal_client_hello() {
+        let template = HelloTemplate {
+            tls_version: 0x0303,
+            client_random: Some([0; 32]),
+            session_id: None,
+            cipher_suites: vec![0x1301], // TLS_AES_128_GCM_SHA256
+            compression_methods: vec![0],
+            extensions: vec![],
+            grease_mode: GreaseMode::None,
+            psk_key_exchange_modes: None,
+        };
+
+        let result = Encoder::encode_client_hello(&template, false);
+        assert!(result.is_ok());
+        let encoded = result.unwrap();
+        assert!(!encoded.raw_bytes.is_empty());
     }
 }

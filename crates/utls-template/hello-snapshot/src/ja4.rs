@@ -93,13 +93,13 @@ pub fn ja4_h2(h2: &H2Settings) -> String {
     let s = h2.settings.iter().map(|(id,val)| format!("{}:{}", id, val)).collect::<Vec<_>>().join("-");
     // return md5 hex of that string for compactness
     let mut hasher = Md5::new();
-    hasher.update(s.as_bytes());
-    format!("{:x}", hasher.finalize())
+    hasher.input(s.as_bytes());
+    format!("{:x}", hasher.result())
 }
 
 pub fn ja4_h3(h3: &H3Settings) -> String {
     let s = h3.settings.iter().map(|(id,val)| format!("{}:{}", id, val)).collect::<Vec<_>>().join("-");
     let mut hasher = Md5::new();
-    hasher.update(s.as_bytes());
-    format!("{:x}", hasher.finalize())
+    hasher.input(s.as_bytes());
+    format!("{:x}", hasher.result())
 }

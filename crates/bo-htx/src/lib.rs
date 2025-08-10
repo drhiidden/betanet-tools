@@ -4,6 +4,15 @@ use bo_core::transport::AsyncStream;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert_eq!(result, 4);
+    }
+}
+
 pub struct Connection {
     pub stream: Box<dyn AsyncStream + Send>,
     pub aead_key: Vec<u8>,

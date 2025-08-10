@@ -3,6 +3,15 @@ use bo_core::{Result, CoreError};
 use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce};
 use chacha20poly1305::aead::{Aead, KeyInit};
 
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert_eq!(result, 4);
+    }
+}
+
 fn le64_to_bytes(v: u64) -> [u8;8] {
     v.to_le_bytes()
 }

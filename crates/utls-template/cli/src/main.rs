@@ -4,7 +4,7 @@ use std::path::Path;
 use clap::Parser;
 use hello_template::{HelloTemplate, Encoder};
 use hello_template::export_utls;
-use hello_snapshot::import_pcap::import_pcap;
+use hello_snapshot::pcap_importer::import_from_pcap;
 use hello_snapshot::snapshot_to_ja3;
 use serde_json;
 
@@ -53,7 +53,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Commands::Selftest { pcap, template } => {
             println!("Importing pcap: {}", pcap);
-            let mut snap = import_pcap(&pcap).map_err(|e| format!("import pcap failed: {}", e))?;
+            let mut snap = import_from_pcap(&pcap).map_err(|e| format!("import pcap failed: {}", e))?;
+            println!("Imported snapshot without ja3: {:?}", snap.raw_client_hello.len());
+
+            // Add JA3 calculation
             snapshot_to_ja3(&mut snap);
             println!("PCAP JA3: {}", snap.ja3.clone().unwrap_or_default());
 
