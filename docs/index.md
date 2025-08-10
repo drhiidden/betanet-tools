@@ -9,9 +9,14 @@ This folder contains the project's documentation. Per the current publishing pol
 
 - **Other (private / not published)**: other documentation (utls-template, specs, communication, spec-linter) is currently in development and ignored by git; if you need access to a specific document, open an issue.
 
+Specs (private / in-development)
+--------------------------------
+- `docs/specs/bn-lint.md` — spec-linter requirements and roadmap
+- `docs/specs/utls-template.md` — utls-template requirements and API
+- `docs/specs/control-stream.md` — CBOR schema and security notes for gateway control stream
+- `docs/specs/control-stream.cbor.schema` — JSON-Schema representation of the CBOR schema
+
 Quick pointers
 
 - Before posting publicly (Discord etc.), review `CONTRIBUTING.md`, `LICENSE-*` and `SECURITY.md`.
-- To propose a bounty, open an issue at: `https://github.com/drhiidden/betanet-tools/issues` and use the bounty template.
-
-If you want files moved from private to public, tell me which ones and I will reorganize them.
+- To propose a bounty, open an issue at: `https://github.com/drhiidden/betanet-tools/issues` and use the bounty template
