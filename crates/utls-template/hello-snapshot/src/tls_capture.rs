@@ -1,7 +1,5 @@
 use std::net::TcpStream;
-use std::io::Cursor;
-use std::time::{Duration, SystemTime};
-use pcap::{self, PacketHeader, Linktype, Writer};
+use std::time::SystemTime;
 
 pub struct CaptureOptions {
     pub allow_hrr: bool, // Si es true, captura HRR + segundo CH
@@ -29,7 +27,14 @@ pub struct CaptureResult {
     pub pcap_bytes: Option<Vec<u8>>, // Bytes del PCAP si emit_pcap es true
 }
 
-pub fn capture_client_hello(stream: &mut TcpStream, opt: &CaptureOptions) -> Result<CaptureResult, String> {
+fn write_u32_le(buf: &mut Vec<u8>, v: u32) {
+    buf.extend_from_slice(&v.to_le_bytes());
+}
+fn write_u16_le(buf: &mut Vec<u8>, v: u16) {
+    buf.extend_from_slice(&v.to_le_bytes());
+}
+
+pub fn capture_client_hello(_stream: &mut TcpStream, opt: &CaptureOptions) -> Result<CaptureResult, String> {
     // Placeholder para la lógica de captura real
     // En un caso real, aquí se leerían los bytes del stream TCP.
     let dummy_initial_ch_bytes = vec![0x16, 0x03, 0x01, 0x00, 0x01]; // Ejemplo muy simplificado
@@ -55,51 +60,38 @@ pub fn capture_client_hello(stream: &mut TcpStream, opt: &CaptureOptions) -> Res
     let mut pcap_bytes: Option<Vec<u8>> = None;
 
     if opt.emit_pcap {
-        let mut buffer = Cursor::new(Vec::new());
-        let mut writer = Writer::new(&mut buffer, Linktype::ETHERNET)
-            .map_err(|e| format!("Failed to create pcap writer: {}", e))?;
+        let mut pcap: Vec<u8> = Vec::new();
+        // pcap global header (little-endian: 0xd4c3b2a1)
+        write_u32_le(&mut pcap, 0xd4c3b2a1);
+        write_u16_le(&mut pcap, 2); // version major
+        write_u16_le(&mut pcap, 4); // version minor
+        write_u32_le(&mut pcap, 0); // thiszone
+        write_u32_le(&mut pcap, 0); // sigfigs
+        write_u32_le(&mut pcap, 65535); // snaplen
+        write_u32_le(&mut pcap, 1); // network (LINKTYPE_ETHERNET)
 
-        let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)
-            .map_err(|e| format!("Failed to get timestamp: {}", e))?;
+        let now = SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_err(|e| format!("ts failed: {}", e))?;
+        let sec = now.as_secs() as u32;
+        let usec = now.subsec_micros() as u32;
 
-        let packet_header = PacketHeader {
-            ts: libc::timeval {
-                tv_sec: timestamp.as_secs() as i64,
-                tv_usec: timestamp.subsec_micros() as i32,
-            },
-            caplen: initial_client_hello.raw_bytes.len() as u32,
-            len: initial_client_hello.raw_bytes.len() as u32,
+        // helper to append a packet record
+        let mut append_packet = |pkt: &Vec<u8>| {
+            write_u32_le(&mut pcap, sec);
+            write_u32_le(&mut pcap, usec);
+            write_u32_le(&mut pcap, pkt.len() as u32);
+            write_u32_le(&mut pcap, pkt.len() as u32);
+            pcap.extend_from_slice(pkt);
         };
-        writer.write_packet(&packet_header, &initial_client_hello.raw_bytes)
-            .map_err(|e| format!("Failed to write initial ClientHello to pcap: {}", e))?;
 
-        if let Some(hrr_bytes) = &hrr_response {
-            let packet_header_hrr = PacketHeader {
-                ts: libc::timeval {
-                    tv_sec: timestamp.as_secs() as i64,
-                    tv_usec: timestamp.subsec_micros() as i32,
-                },
-                caplen: hrr_bytes.len() as u32,
-                len: hrr_bytes.len() as u32,
-            };
-            writer.write_packet(&packet_header_hrr, hrr_bytes)
-                .map_err(|e| format!("Failed to write HRR to pcap: {}", e))?;
+        append_packet(&initial_client_hello.raw_bytes);
+        if let Some(hrr) = &hrr_response {
+            append_packet(hrr);
+        }
+        if let Some(second) = &second_client_hello {
+            append_packet(&second.raw_bytes);
         }
 
-        if let Some(second_ch) = &second_client_hello {
-            let packet_header_second_ch = PacketHeader {
-                ts: libc::timeval {
-                    tv_sec: timestamp.as_secs() as i64,
-                    tv_usec: timestamp.subsec_micros() as i32,
-                },
-                caplen: second_ch.raw_bytes.len() as u32,
-                len: second_ch.raw_bytes.len() as u32,
-            };
-            writer.write_packet(&packet_header_second_ch, &second_ch.raw_bytes)
-                .map_err(|e| format!("Failed to write second ClientHello to pcap: {}", e))?;
-        }
-
-        pcap_bytes = Some(buffer.into_inner());
+        pcap_bytes = Some(pcap);
     }
 
     Ok(CaptureResult {

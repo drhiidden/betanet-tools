@@ -4,6 +4,9 @@ use std::path::Path;
 use clap::Parser;
 use hello_template::{HelloTemplate, Encoder};
 use hello_template::export_utls;
+use hello_snapshot::import_pcap::import_pcap;
+use hello_snapshot::snapshot_to_ja3;
+use serde_json;
 
 #[derive(Parser)]
 struct Cmd {
@@ -18,6 +21,10 @@ enum Commands {
         #[arg(long)] out: Option<String>,
         #[arg(long)] emit_pcap: bool,
         #[arg(long)] export_utls: Option<String>,
+    },
+    Selftest {
+        #[arg(long)] pcap: String,
+        #[arg(long)] template: String,
     }
 }
 
@@ -42,6 +49,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let go_snip = export_utls::export_utls_go(&tpl);
                 std::fs::write(&go_path, go_snip)?;
                 println!("Wrote uTLS Go snippet {}", go_path);
+            }
+        }
+        Commands::Selftest { pcap, template } => {
+            println!("Importing pcap: {}", pcap);
+            let mut snap = import_pcap(&pcap).map_err(|e| format!("import pcap failed: {}", e))?;
+            snapshot_to_ja3(&mut snap);
+            println!("PCAP JA3: {}", snap.ja3.clone().unwrap_or_default());
+
+            let mut f = File::open(&template)?;
+            let mut s = String::new();
+            f.read_to_string(&mut s)?;
+            let tpl: HelloTemplate = serde_json::from_str(&s)?;
+            let enc = Encoder::encode_client_hello(&tpl, false)?;
+            // compute ja3 of generated
+            let mut generated = snap.clone();
+            generated.raw_client_hello = enc.raw_bytes;
+            snapshot_to_ja3(&mut generated);
+            println!("Generated JA3: {}", generated.ja3.clone().unwrap_or_default());
+
+            if snap.ja3 == generated.ja3 {
+                println!("SELFTEST PASS: JA3 match");
+            } else {
+                println!("SELFTEST FAIL: JA3 differ");
+                return Err("selftest failed".into());
             }
         }
     }

@@ -5,3 +5,6 @@ edition = "2021"
 
 [dependencies]
 pcap = "0.10" # Versión a verificar, usar la más reciente compatible
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+md-5 = "0.10"
