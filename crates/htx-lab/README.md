@@ -1,22 +1,20 @@
 # htx-lab
 
-Propósito
+Toy prototypes and experiments for HTX features used by Betanet tools.
 
-- Laboratorio para prototipos HTX: diseño de frames, especificación Noise XK, AEAD, y pruebas de interoperabilidad.
-- Contiene objetivos de fuzzing y tests de integración.
+Modules included
+- `mixnet_sim` — toy simulator for route selection latency.
+- `control_stream_examples` — placeholder CBOR generator/parser.
+- `tunnel_mock` — simple encapsulation/decapsulation utility.
 
-Estructura
+Run tests
+---------
 
-- `src/` — implementaciones y utilidades
-- `fuzz/` — targets de `cargo-fuzz` para `framing`, `parser`, `state`
-- `tests/` — tests de integración y golden vectors
+```bash
+# Run only htx-lab tests
+cargo test -p htx-lab
+```
 
-Comandos
-
-- Compilar: `cargo build -p htx-lab`
-- Tests: `cargo test -p htx-lab`
-- Ejecutar fuzz (local): `cargo fuzz run framing`
-
-Notas
-
-- Mantener fuzz targets pequeños y bien documentados; añadir CI específico para fuzz en paralelo si es crítico.
+Add fixtures
+------------
+Large fixtures belong under `crates/htx-lab/fixtures/` with a `README.md` describing origin and sanitisation.
