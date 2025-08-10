@@ -9,7 +9,8 @@ path = "src/lib.rs"
 
 [dependencies]
 rustls = "0.21"
-tokio = { version = "1", features = ["rt", "macros"] }
+tokio = { version = "1", features = ["rt", "macros", "io-util"] }
 bo-core = { path = "../bo-core" }
+tokio-rustls = "0.23"
 
 
