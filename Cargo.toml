@@ -1,0 +1,20 @@
+[workspace]
+members = [
+  "crates/utls-template/hello-template",
+  "crates/utls-template/hello-snapshot",
+  "crates/utls-template/chrome-probe",
+  "crates/bn-lint",
+  "crates/htx-lab",
+  "crates/sbom",
+]
+
+[profile.release]
+opt-level = "z"       # tamaño + optimizaciones
+lto = true             # Link Time Optimization
+codegen-units = 1      # mejor optimización en release
+panic = "abort"       # menores binarios y rendimiento
+
+[workspace.package]
+# Metadata opcional del workspace (no publica crates automáticamente)
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/yourorg/betanet-tools"
