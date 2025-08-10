@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 
+use crate::quic;
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct TlsSnapshot {
     pub raw_client_hello: Vec<u8>,
@@ -87,8 +89,15 @@ pub fn import_pcap(path: &str) -> Result<TlsSnapshot, String> {
         return Ok(TlsSnapshot { raw_client_hello: ch, ja3: None });
     }
 
-    // Next, search each UDP flow concat for ClientHello bytes (could be inside CRYPTO frames)
+    // Next, for each UDP flow, try to extract crypto from QUIC and find ClientHello
     for (_k, buf) in udp_flows.iter() {
+        let crypto = quic::extract_crypto_from_flow(buf);
+        if crypto.len() > 0 {
+            if let Some(ch) = find_client_hello_in_buf(&crypto) {
+                return Ok(TlsSnapshot { raw_client_hello: ch, ja3: None });
+            }
+        }
+        // fallback: direct search in raw flow
         if let Some(ch) = find_client_hello_in_buf(buf) {
             return Ok(TlsSnapshot { raw_client_hello: ch, ja3: None });
         }

@@ -3,6 +3,7 @@ pub mod h2_h3_capture;
 pub mod import_pcap;
 pub mod ja3;
 pub mod ja4;
+pub mod quic;
 
 use md5::{Md5, Digest};
 use crate::import_pcap::TlsSnapshot;
