@@ -1,0 +1,9 @@
+[package]
+name = "hello-template"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pcap = "0.10" # Versión a verificar, usar la más reciente compatible
+serde = { version = "1.0", features = ["derive"] }
+libc = "0.2"
