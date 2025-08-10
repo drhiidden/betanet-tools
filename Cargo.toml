@@ -7,6 +7,10 @@ members = [
   "crates/bn-lint",
   "crates/htx-lab",
   "crates/sbom",
+  "crates/bo-core",
+  "crates/bo-tls",
+  "crates/bo-htx",
+  "crates/bo-aead",
 ]
 
 [profile.release]

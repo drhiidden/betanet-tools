@@ -1,0 +1,14 @@
+[package]
+name = "bo-htx"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "bo_htx"
+path = "src/lib.rs"
+
+[dependencies]
+bo-core = { path = "../bo-core" }
+bytes = "1.4"
+
+

@@ -1,0 +1,15 @@
+[package]
+name = "bo-tls"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "bo_tls"
+path = "src/lib.rs"
+
+[dependencies]
+rustls = "0.21"
+tokio = { version = "1", features = ["rt", "macros"] }
+bo-core = { path = "../bo-core" }
+
+
