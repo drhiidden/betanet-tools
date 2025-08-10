@@ -7,7 +7,6 @@ use tokio::task;
 use tokio_rustls::rustls as rustls;
 use rustls::StreamOwned;
 use rustls::client::ServerName;
-use tokio::io::{AsyncRead, AsyncWrite};
 
 /// Conecta a `addr` ("host:port") y devuelve `export_keying_material(label, None, len)`.
 pub async fn export_keying_material_rustls(addr: &str, server_name: &str, label: &str, len: usize) -> Result<Vec<u8>> {
@@ -35,7 +34,7 @@ pub async fn export_keying_material_rustls(addr: &str, server_name: &str, label:
 
         // Extraer exporter si la sesión lo soporta
         let mut out = vec![0u8; len];
-        if tls.conn.export_keying_material(label.as_bytes(), None, &mut out).is_ok() {
+        if tls.conn.export_keying_material(&mut out, _label.as_bytes(), None).is_ok() {
             Ok(out)
         } else {
             Ok(vec![0u8; len])
