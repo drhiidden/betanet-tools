@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Control Stream (CBOR) schema",
+  "type": "object",
+  "required": ["version","nonce","ts","mac","rate_limit"],
+  "properties": {
+    "version": {"type":"string"},
+    "nonce": {"type":"string","description":"Base64 or bytes"},
+    "ts": {"type":"integer","description":"Unix timestamp (ms)"},
+    "mac": {"type":"string","description":"Message authentication code (bytes/base64)"},
+    "rate_limit": {
+      "type":"object",
+      "required":["rate","burst"],
+      "properties":{
+        "rate":{"type":"number","description":"tokens per second"},
+        "burst":{"type":"integer","description":"max burst tokens"}
+      }
+    },
+    "payload": {"type":"object","description":"Optional control payload (CBOR map)"}
+  }
+}
