@@ -1,7 +1,4 @@
-docs/betanet/**
-docs/spec-linter/**
-docs/utls-template/**
-docs/communication/**
+docs/a/**
 .cursor/
 target/
 Cargo.lock
